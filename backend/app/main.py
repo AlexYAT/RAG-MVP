@@ -4,6 +4,7 @@ from fastapi import FastAPI, Query
 
 from app.generation.pipeline import run_generation_answer
 from app.knowledge.loader import ingest_summary
+from app.orchestration.service import run_orchestration
 from app.retrieval.search import get_retrieval_index, hits_to_payload, search_chunks
 
 app = FastAPI(title="RAG MVP", version="0.1.0")
@@ -45,3 +46,12 @@ def generation_answer(
 ) -> dict[str, object]:
     """Generation baseline: query → retrieval → extractive grounded answer (no orchestration)."""
     return run_generation_answer(q.strip(), top_k)
+
+
+@app.get("/orchestration/query")
+def orchestration_query(
+    q: str = Query(..., min_length=1, description="Unified flow: query → retrieval → answer."),
+    top_k: int = Query(5, ge=1, le=20, description="Retrieval depth for the pipeline."),
+) -> dict[str, object]:
+    """Orchestration layer: unified response contract; same pipeline as generation, stable extension point."""
+    return run_orchestration(q.strip(), top_k)
