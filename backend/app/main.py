@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI, Query
 
+from app.generation.pipeline import run_generation_answer
 from app.knowledge.loader import ingest_summary
 from app.retrieval.search import get_retrieval_index, hits_to_payload, search_chunks
 
@@ -35,3 +36,12 @@ def retrieval_search(
         "chunk_count": index.chunk_count,
         "results": hits_to_payload(hits),
     }
+
+
+@app.get("/generation/answer")
+def generation_answer(
+    q: str = Query(..., min_length=1, description="User query: retrieval → grounded answer."),
+    top_k: int = Query(5, ge=1, le=20, description="Retrieval depth for generation context."),
+) -> dict[str, object]:
+    """Generation baseline: query → retrieval → extractive grounded answer (no orchestration)."""
+    return run_generation_answer(q.strip(), top_k)
