@@ -1,0 +1,107 @@
+# DocOps Cursor Rules
+
+## Core Principles
+
+- Docs-first
+- Create-only
+- Prompt-driven execution
+- No manual edits
+
+---
+
+## Create-only Enforcement
+
+- NEVER modify existing documents
+- ONLY create new files
+- If update is required -> create new document
+
+---
+
+## ID Generation
+
+- ALWAYS scan target directory
+- Determine next available ID
+- NEVER reuse IDs
+- NEVER assign IDs manually
+
+---
+
+## File Placement
+
+Canonical path: `docs/<doc_type>/` — use the **exact** `doc_type` slug from metadata (no renames or “cleanups”).
+
+- idea_to_mvp -> docs/idea_to_mvp/
+- architecture_draft -> docs/architecture_draft/
+- decision_log -> docs/decision_log/
+- operational_plan -> docs/operational_plan/
+- implementation_snapshot -> docs/implementation_snapshot/
+
+---
+
+## doc_type vs status (DOA-DEC-060, DOA-ARCH-026)
+
+- **doc_type** = class of artifact (copy **exactly**).
+- **status** = maturity/state (draft | review | accepted | obsolete).
+- Substring **draft** inside **doc_type** (e.g. `architecture_draft`) is **not** `Status: draft`.
+- Pairs like `architecture_draft` + **accepted** are valid.
+- No type renaming, folder migrations, or semantic cleanup **without** a separate lifecycle + **decision_log**.
+
+---
+
+## Metadata Enforcement
+
+Each document MUST contain:
+
+- Project
+- Doc type
+- ID
+- Status
+- Date
+- Parent
+
+---
+
+## Prompt Execution Contract
+
+- Execute ONLY what is specified in prompt
+- Do NOT infer extra actions
+- Do NOT change content beyond instructions
+
+---
+
+## Git Rules
+
+After every operation:
+
+- git add .
+- git commit
+
+Commit message must match task type:
+- docs(dec)
+- docs(op)
+- docs(imp)
+
+---
+
+## Error Handling
+
+If operation fails:
+
+- STOP execution
+- DO NOT attempt auto-fix
+- RETURN error
+
+---
+
+## Snapshot Mode
+
+- Ignore legacy errors (pre-snapshot)
+- Operate only in controlled documents
+- Respect snapshot boundaries
+
+---
+
+## Reproducibility
+
+- Every action must be reproducible via prompt
+- No hidden changes allowed

@@ -1,0 +1,298 @@
+---
+description: DocOps Agent — Docs-first project rules
+alwaysApply: true
+---
+
+Ты работаешь в проекте DocOps Agent.
+
+Главный принцип:
+если что-то не задокументировано, этого не существует.
+
+---
+
+## Core principles
+
+1. Docs-first
+Любая значимая работа начинается с документации.
+
+2. Planning-first
+Работа выполняется только через план.
+Запрещено выполнять задачи вне operational_plan,
+кроме стартового этапа до первого accepted operational_plan.
+
+3. Create-only
+Содержательные изменения выполняются только через новый документ или новую версию.
+Не переписывай историю без явного указания.
+
+4. Explicit decisions
+Все значимые решения фиксируются через decision_log.
+
+5. Traceability
+Каждый документ должен иметь корректный metadata-блок,
+ID, doc_type и parent (parent может быть null).
+
+6. doc_type vs status (DOA-DEC-060, DOA-ARCH-026)
+- **doc_type** — имя **класса артефакта** (стабильный идентификатор типа). Пиши и копируй **как есть**, без переименований и «улучшений».
+- **status** — ось **зрелости/состояния** конкретного файла.
+- Подстрока **draft** внутри **doc_type** (например `architecture_draft`) — часть **имени класса**, а **не** синоним `Status: draft` и **не** основание выводить зрелость без поля **Status**.
+- Сочетания вроде **`architecture_draft` + `Status: accepted`** допустимы.
+- Канонический путь: **`docs/<doc_type>/`** (см. размещение ниже); путь **не** выбирай по «смыслу» слов внутри имени типа.
+- Semantic cleanup, переименование **doc_type**, каталогов и миграции — **только** при отдельном lifecycle и **decision_log**, не в рамках произвольного hardening без DEC.
+
+---
+
+## Canonical storage
+
+Каноническое размещение документов — только в структуре:
+
+- docs/idea_to_mvp/
+- docs/architecture_draft/
+- docs/decision_log/
+- docs/implementation_snapshot/
+- docs/audit_check/
+- docs/longterm_plan/
+- docs/midterm_plan/
+- docs/operational_plan/
+
+Каталог TZ / tz / внешние staging-папки не являются source of truth.
+
+Если документ создаётся как рабочий артефакт проекта,
+он должен сохраняться сразу в docs/<doc_type>/.
+
+---
+
+## Supported doc_types
+
+Разрешённые типы документов:
+
+- idea_to_mvp
+- architecture_draft
+- decision_log
+- implementation_snapshot
+- audit_check
+- longterm_plan
+- midterm_plan
+- operational_plan
+
+Не создавай новые doc_types без явного решения через decision_log.
+
+---
+
+## Metadata model
+
+Каждый документ должен начинаться с блока:
+
+## Metadata
+- Project: DOA
+- Doc type: <doc_type>
+- ID: <ID>
+- Status: <draft | review | accepted | obsolete>
+- Date: YYYY-MM-DD
+- Parent: null
+
+Пример для нового документа по умолчанию: `Status: draft`. Значение **Status** задаёт зрелость; оно **независимо** от буквального состава **doc_type** (см. § doc_type vs status выше).
+
+Дополнительно допустимы:
+- Replaces: <ID>
+- Tags: [optional]
+
+Правила:
+- Parent обязателен как поле, но может быть null
+- ID должен быть уникален
+- **Doc type** — ровно один из поддерживаемых slug’ов; не подменяй на «удобные» имена.
+- Status допустим только:
+  - draft
+  - review
+  - accepted
+  - obsolete
+
+---
+
+## Naming convention
+
+Формат ID:
+
+<PROJECT>-<TYPE>-<NNN>
+
+Для проекта DOA используются:
+
+- idea_to_mvp → DOA-IDEA-<NNN>
+- architecture_draft → DOA-ARCH-<NNN>
+- decision_log → DOA-DEC-<NNN>
+- implementation_snapshot → DOA-IMP-<NNN>
+- audit_check → DOA-AUD-<NNN>
+- longterm_plan → DOA-LT-<NNN>
+- midterm_plan → DOA-MT-<NNN>
+- operational_plan → DOA-OP-<NNN>
+
+Не используй нестандартные ID.
+
+---
+
+## Status policy
+
+По умолчанию:
+- новый документ → `Status: draft` (это поле metadata, не «намёк» из **doc_type**)
+
+Accepted использовать только когда документ действительно утверждён.
+Obsolete использовать только для заменённых версий.
+
+Не меняй статус старого документа без явной причины.
+
+Не путай **зрелость** (Status) с именем класса (**doc_type**): наличие слова draft в **doc_type** не задаёт Status автоматически.
+
+---
+
+## File placement rules
+
+Сохраняй документы в соответствующие каталоги:
+
+- DOA-IDEA-* → docs/idea_to_mvp/
+- DOA-ARCH-* → docs/architecture_draft/
+- DOA-DEC-* → docs/decision_log/
+- DOA-IMP-* → docs/implementation_snapshot/
+- DOA-AUD-* → docs/audit_check/
+- DOA-LT-* → docs/longterm_plan/
+- DOA-MT-* → docs/midterm_plan/
+- DOA-OP-* → docs/operational_plan/
+
+---
+
+## Template rules by doc_type
+
+### idea_to_mvp
+Используй разделы:
+- Summary
+- Goal
+- MVP Scope
+- Core Idea
+- Constraints
+- Success Criteria
+- Next Steps
+
+### architecture_draft
+Используй разделы:
+- Summary
+- Goal
+- Scope
+- Roles & Scenarios
+- Document Model
+- Metadata Model
+- Naming Convention
+- System Rules
+- Workflow
+- Constraints
+- Definition of Done
+
+### decision_log
+Используй разделы:
+- Title
+- Context
+- Options considered
+- Chosen solution
+- Why
+- Trade-offs
+- Follow-ups
+
+### implementation_snapshot
+Используй разделы:
+- Summary
+- Current State
+- What was completed
+- Related tasks
+- Related commits
+- Known issues
+- Next step
+
+### audit_check
+Используй разделы:
+- Summary
+- Scope of audit
+- Checked documents
+- Findings
+- Violations
+- Recommendations
+- Decision needed
+- Result
+
+### longterm_plan
+Используй разделы:
+- Summary
+- Strategic Goal
+- Time Horizon
+- Milestones
+- Risks
+- Expected Result
+
+### midterm_plan
+Используй разделы:
+- Summary
+- Goal
+- Milestones
+- Dependencies
+- Risks
+- Expected Result
+
+У milestone должны быть:
+- ID
+- Title
+- Done when
+
+### operational_plan
+Используй разделы:
+- Goal
+- Scope
+- Tasks
+- Dependencies
+- Definition of Done
+- Notes
+
+У задачи должны быть:
+- Task ID
+- Description
+- Done when
+- Dependencies (optional)
+
+---
+
+## Execution rules
+
+1. Не удаляй исторические документы без явного указания.
+2. Не перемещай старые документы автоматически, если это не отдельная задача operational_plan.
+3. Если найден конфликт:
+   - не исправляй молча
+   - сначала создай или запроси decision_log
+4. Если задача касается legacy/staging/import:
+   - сначала классификация
+   - потом решение
+   - потом раскладка
+5. Не делай “скрытых улучшений” вне задачи.
+
+---
+
+## Notion / MCP policy
+
+Не считать Notion каноническим хранилищем по умолчанию.
+Не создавать страницу в Notion автоматически, если это не запрошено явно.
+
+Source of truth для проекта — файлы в репозитории.
+
+---
+
+## Communication rules
+
+- Не задавай лишних уточняющих вопросов, если задача уже определена operational_plan или decision_log.
+- Действуй в рамках текущего плана.
+- Если обнаружено противоречие в структуре — сначала зафиксируй это как decision_log или audit_check, а не исправляй молча.
+
+---
+
+## Current project mode
+
+MVP mode:
+- минимальная сложность
+- markdown-only
+- manual validation
+- один пользователь
+- без автоматизации
+- без sync/update логики
