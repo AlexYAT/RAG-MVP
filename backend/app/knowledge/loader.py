@@ -14,24 +14,39 @@ def knowledge_root() -> Path:
     return _project_root() / "data" / "knowledge"
 
 
-def load_markdown_documents() -> list[dict[str, str | int]]:
-    """Read all *.md under knowledge root; return metadata and previews."""
+def load_markdown_full_documents() -> list[dict[str, str]]:
+    """Full markdown text per file under knowledge root (for retrieval)."""
     root = knowledge_root()
     if not root.is_dir():
         return []
 
-    out: list[dict[str, str | int]] = []
+    out: list[dict[str, str]] = []
     for path in sorted(root.rglob("*.md")):
         rel = path.relative_to(root)
         category = rel.parts[0] if rel.parts else "unknown"
         text = path.read_text(encoding="utf-8")
+        out.append(
+            {
+                "relative_path": rel.as_posix(),
+                "category": category,
+                "text": text,
+            }
+        )
+    return out
+
+
+def load_markdown_documents() -> list[dict[str, str | int]]:
+    """Read all *.md under knowledge root; return metadata and previews."""
+    out: list[dict[str, str | int]] = []
+    for doc in load_markdown_full_documents():
+        text = doc["text"]
         preview = text.strip()
         if len(preview) > _PREVIEW_LEN:
             preview = preview[:_PREVIEW_LEN] + "..."
         out.append(
             {
-                "relative_path": rel.as_posix(),
-                "category": category,
+                "relative_path": doc["relative_path"],
+                "category": doc["category"],
                 "char_count": len(text),
                 "preview": preview,
             }
