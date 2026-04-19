@@ -6,6 +6,7 @@ from app.generation.pipeline import run_generation_answer
 from app.knowledge.loader import ingest_summary
 from app.orchestration.service import run_orchestration
 from app.retrieval.search import get_retrieval_index, hits_to_payload, search_chunks
+from app.scenarios.service import run_scenario_flow
 
 app = FastAPI(title="RAG MVP", version="0.1.0")
 
@@ -55,3 +56,12 @@ def orchestration_query(
 ) -> dict[str, object]:
     """Orchestration layer: unified response contract; same pipeline as generation, stable extension point."""
     return run_orchestration(q.strip(), top_k)
+
+
+@app.get("/scenarios/handle")
+def scenario_handle(
+    q: str = Query(..., min_length=1, description="Scenario flow over orchestration."),
+    top_k: int = Query(5, ge=1, le=20, description="Retrieval depth for answer path."),
+) -> dict[str, object]:
+    """Scenario handling baseline: FAQ/selection/overview with one-step clarify for selection."""
+    return run_scenario_flow(q.strip(), top_k)
