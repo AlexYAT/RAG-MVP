@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RAG MVP Demo UI</title>
+    <link rel="stylesheet" href="/ui/static/styles.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>RAG MVP Demo UI</h1>
+            <p class="muted">Scenario-level demo: FAQ / selection / overview</p>
+        </header>
+
+        <section class="panel">
+            <form id="query-form">
+                <label for="query-input">Запрос</label>
+                <div class="row">
+                    <input id="query-input" type="text" placeholder="Введите вопрос или запрос на подбор..." required>
+                    <button type="submit">Отправить</button>
+                </div>
+            </form>
+            <p id="status" class="muted"></p>
+            <div class="examples">
+                <button class="example" data-q="Какой срок гарантии?">FAQ пример</button>
+                <button class="example" data-q="Сделай обзор направлений">Overview пример</button>
+                <button class="example" data-q="Подбери портативный УЗИ для кабинета">Selection пример</button>
+                <button class="example" data-q="Подбери оборудование">Selection clarify</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>История demo-сессии</h2>
+            <div id="history" class="history"></div>
+        </section>
+    </main>
+
+    <script src="/ui/static/app.js"></script>
+</body>
+</html>

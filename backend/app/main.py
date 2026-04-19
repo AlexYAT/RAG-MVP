@@ -1,6 +1,10 @@
-"""ASGI application entry: minimal API for bootstrap phase."""
+"""ASGI application entry with demo UI endpoints."""
+
+from pathlib import Path
 
 from fastapi import FastAPI, Query
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.generation.pipeline import run_generation_answer
 from app.knowledge.loader import ingest_summary
@@ -9,12 +13,20 @@ from app.retrieval.search import get_retrieval_index, hits_to_payload, search_ch
 from app.scenarios.service import run_scenario_flow
 
 app = FastAPI(title="RAG MVP", version="0.1.0")
+_UI_DIR = Path(__file__).resolve().parent / "ui"
+app.mount("/ui/static", StaticFiles(directory=_UI_DIR), name="ui-static")
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
     """Liveness check for local development."""
     return {"status": "ok"}
+
+
+@app.get("/ui")
+def web_ui() -> FileResponse:
+    """Demo-first web UI entrypoint."""
+    return FileResponse(_UI_DIR / "index.html")
 
 
 @app.get("/ingest/status")
