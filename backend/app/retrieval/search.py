@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
+import json
 import os
 from pathlib import Path
 from typing import Literal
@@ -20,6 +22,7 @@ from app.retrieval.chunks import build_chunk_records
 _MAX_TOP_K = 20
 _CHROMA_PATH_ENV = "CHROMA_PATH"
 _COLLECTION_ENV = "COLLECTION_NAME"
+_INDEX_STATE_VERSION = 1
 
 
 def _project_root() -> Path:
@@ -97,14 +100,28 @@ class TfidfKeywordIndex:
 class SemanticVectorIndex:
     """Primary semantic index backed by VectorStore abstraction."""
 
-    def __init__(self, store: VectorStore) -> None:
+    def __init__(self, store: VectorStore, state_dir: str, collection_name: str) -> None:
         self._store = store
         self._records = build_chunk_records(load_markdown_full_documents())
-        self._upsert_records()
+        self._state_dir = Path(state_dir)
+        self._collection_name = collection_name
+        safe_collection = "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in collection_name)
+        self._fingerprint_path = self._state_dir / f".semantic_index_state_{safe_collection}.json"
+        self._last_build_action = "unknown"
+        self._last_build_reason = "not_initialized"
+        self._sync_index()
 
     @property
     def chunk_count(self) -> int:
         return len(self._records)
+
+    @property
+    def last_build_action(self) -> str:
+        return self._last_build_action
+
+    @property
+    def last_build_reason(self) -> str:
+        return self._last_build_reason
 
     def _embed_text(self, text: str) -> list[float]:
         return get_text_embedding(text)
@@ -113,7 +130,57 @@ class SemanticVectorIndex:
     def _to_chunk_id(relative_path: str, chunk_index: int) -> str:
         return f"{relative_path}::chunk::{chunk_index}"
 
-    def _upsert_records(self) -> None:
+    def _compute_corpus_fingerprint(self) -> str:
+        hasher = hashlib.sha256()
+        ordered_records = sorted(
+            self._records,
+            key=lambda r: (str(r["relative_path"]), int(r["chunk_index"]), str(r["category"])),
+        )
+        for rec in ordered_records:
+            hasher.update(str(rec["relative_path"]).encode("utf-8"))
+            hasher.update(b"\x00")
+            hasher.update(str(rec["category"]).encode("utf-8"))
+            hasher.update(b"\x00")
+            hasher.update(str(int(rec["chunk_index"])).encode("utf-8"))
+            hasher.update(b"\x00")
+            hasher.update(str(rec["text"]).encode("utf-8"))
+            hasher.update(b"\x00")
+        return hasher.hexdigest()
+
+    def _read_saved_fingerprint(self) -> tuple[str | None, str]:
+        if not self._fingerprint_path.exists():
+            return None, "state_missing"
+        try:
+            raw = json.loads(self._fingerprint_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None, "state_invalid"
+        if not isinstance(raw, dict):
+            return None, "state_invalid"
+        if int(raw.get("version", -1)) != _INDEX_STATE_VERSION:
+            return None, "state_version_mismatch"
+        if str(raw.get("collection", "")) != self._collection_name:
+            return None, "state_collection_mismatch"
+        fp = raw.get("fingerprint")
+        if not isinstance(fp, str) or not fp.strip():
+            return None, "state_fingerprint_missing"
+        return fp.strip(), "state_loaded"
+
+    def _write_fingerprint(self, fingerprint: str) -> None:
+        payload = {
+            "version": _INDEX_STATE_VERSION,
+            "collection": self._collection_name,
+            "fingerprint": fingerprint,
+            "record_count": len(self._records),
+        }
+        self._state_dir.mkdir(parents=True, exist_ok=True)
+        self._fingerprint_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+    def _full_rebuild(self) -> None:
+        # Fingerprint strategy in MVP keeps full rebuild behavior only on corpus change.
+        self._store.reset()
         if not self._records:
             return
         texts = [str(rec["text"]) for rec in self._records]
@@ -142,17 +209,27 @@ class SemanticVectorIndex:
                     },
                 }
             )
+        self._store.upsert(docs)
+
+    def _sync_index(self) -> None:
+        current_fp = self._compute_corpus_fingerprint()
+        saved_fp, state_reason = self._read_saved_fingerprint()
+        if saved_fp == current_fp:
+            self._last_build_action = "skip"
+            self._last_build_reason = "fingerprint_match"
+            return
         try:
-            self._store.upsert(docs)
-        except Exception as exc:
-            # Existing local collections may contain embeddings from previous dimensionality.
-            # Reset once and upsert with current semantic vectors.
-            msg = str(exc).lower()
-            if "dimension" in msg or "dimensionality" in msg:
-                self._store.reset()
-                self._store.upsert(docs)
+            self._full_rebuild()
+            self._write_fingerprint(current_fp)
+            self._last_build_action = "rebuild"
+            if state_reason == "state_loaded":
+                self._last_build_reason = "fingerprint_changed"
             else:
-                raise RuntimeError(f"Failed to upsert semantic embeddings: {exc}") from exc
+                self._last_build_reason = state_reason
+        except OpenAIEmbeddingError:
+            raise
+        except Exception as exc:
+            raise RuntimeError(f"Failed to sync semantic index: {exc}") from exc
 
     def search(self, query: str, top_k: int) -> list[RetrievalHit]:
         q = (query or "").strip()
@@ -190,11 +267,15 @@ def _get_keyword_index() -> TfidfKeywordIndex:
 def get_retrieval_index() -> SemanticVectorIndex:
     global _semantic_index
     if _semantic_index is None:
+        chroma_path = os.getenv(_CHROMA_PATH_ENV, _default_chroma_path())
+        collection = _collection_name()
         _semantic_index = SemanticVectorIndex(
             store=ChromaVectorStore(
-                persist_path=os.getenv(_CHROMA_PATH_ENV, _default_chroma_path()),
-                collection_name=_collection_name(),
-            )
+                persist_path=chroma_path,
+                collection_name=collection,
+            ),
+            state_dir=chroma_path,
+            collection_name=collection,
         )
     return _semantic_index
 
