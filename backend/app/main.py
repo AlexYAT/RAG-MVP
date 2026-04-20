@@ -61,7 +61,7 @@ def generation_answer(
     q: str = Query(..., min_length=1, description="User query: retrieval → grounded answer."),
     top_k: int = Query(5, ge=1, le=20, description="Retrieval depth for generation context."),
 ) -> dict[str, object]:
-    """Generation baseline: query → retrieval → extractive grounded answer (no orchestration)."""
+    """Generation baseline: query → retrieval → grounded LLM answer (no orchestration rewrite)."""
     return run_generation_answer(q.strip(), top_k)
 
 

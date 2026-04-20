@@ -25,21 +25,16 @@ def run_generation_answer_with_hits(query: str, top_k: int, hits: list[Retrieval
     }
 
 
-def run_generation_answer(query: str, top_k: int) -> dict[str, Any]:
+def run_retrieval_generation_pipeline(query: str, top_k: int) -> dict[str, Any]:
     """
-    Service check: run retrieval baseline, then generation layer.
+    End-to-end answer path: retrieval -> grounded generation -> response payload.
     """
     hits = search_chunks(query, top_k)
-    gen = generate_from_hits(query, hits)
-    return {
-        "query": gen["query"],
-        "answer": gen["answer"],
-        "fallback": gen["fallback"],
-        "fallback_reason": gen["fallback_reason"],
-        "sources": gen["sources"],
-        "retrieval": {
-            "top_k_requested": top_k,
-            "hits_returned": len(hits),
-            "results": hits_to_payload(hits),
-        },
-    }
+    return run_generation_answer_with_hits(query, top_k, hits)
+
+
+def run_generation_answer(query: str, top_k: int) -> dict[str, Any]:
+    """
+    Backward-compatible public entrypoint for generation answer route.
+    """
+    return run_retrieval_generation_pipeline(query, top_k)
