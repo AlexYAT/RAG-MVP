@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Literal
 
 import numpy as np
-from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from app.core.llm.openai_embeddings import OpenAIEmbeddingError, get_text_embedding, get_text_embeddings
 from app.core.vectorstore.base import VectorDocument, VectorStore
 from app.core.vectorstore.chroma_store import ChromaVectorStore
 from app.knowledge.loader import load_markdown_full_documents
@@ -100,13 +100,6 @@ class SemanticVectorIndex:
     def __init__(self, store: VectorStore) -> None:
         self._store = store
         self._records = build_chunk_records(load_markdown_full_documents())
-        self._embedder = HashingVectorizer(
-            analyzer="char_wb",
-            ngram_range=(3, 5),
-            n_features=512,
-            alternate_sign=False,
-            norm="l2",
-        )
         self._upsert_records()
 
     @property
@@ -114,16 +107,24 @@ class SemanticVectorIndex:
         return len(self._records)
 
     def _embed_text(self, text: str) -> list[float]:
-        vec = self._embedder.transform([text]).toarray()[0]
-        return [float(v) for v in vec]
+        return get_text_embedding(text)
 
     @staticmethod
     def _to_chunk_id(relative_path: str, chunk_index: int) -> str:
         return f"{relative_path}::chunk::{chunk_index}"
 
     def _upsert_records(self) -> None:
+        if not self._records:
+            return
+        texts = [str(rec["text"]) for rec in self._records]
+        embeddings = get_text_embeddings(texts)
+        if len(embeddings) != len(self._records):
+            raise RuntimeError(
+                "Semantic embedding count mismatch during indexing: "
+                f"{len(embeddings)} embeddings for {len(self._records)} records."
+            )
         docs: list[VectorDocument] = []
-        for rec in self._records:
+        for rec, emb in zip(self._records, embeddings):
             relative_path = str(rec["relative_path"])
             category = str(rec["category"])
             chunk_index = int(rec["chunk_index"])
@@ -131,7 +132,7 @@ class SemanticVectorIndex:
             docs.append(
                 {
                     "id": self._to_chunk_id(relative_path, chunk_index),
-                    "embedding": self._embed_text(text),
+                    "embedding": [float(v) for v in emb],
                     "text": text,
                     "metadata": {
                         "relative_path": relative_path,
@@ -141,7 +142,17 @@ class SemanticVectorIndex:
                     },
                 }
             )
-        self._store.upsert(docs)
+        try:
+            self._store.upsert(docs)
+        except Exception as exc:
+            # Existing local collections may contain embeddings from previous dimensionality.
+            # Reset once and upsert with current semantic vectors.
+            msg = str(exc).lower()
+            if "dimension" in msg or "dimensionality" in msg:
+                self._store.reset()
+                self._store.upsert(docs)
+            else:
+                raise RuntimeError(f"Failed to upsert semantic embeddings: {exc}") from exc
 
     def search(self, query: str, top_k: int) -> list[RetrievalHit]:
         q = (query or "").strip()
@@ -201,8 +212,10 @@ def search_chunks_with_mode(query: str, top_k: int, mode: RetrievalMode) -> list
     if m == "semantic":
         try:
             return get_retrieval_index().search(query, top_k)
-        except Exception:
-            return []
+        except OpenAIEmbeddingError as exc:
+            raise RuntimeError(f"Semantic retrieval unavailable: {exc}") from exc
+        except Exception as exc:
+            raise RuntimeError(f"Semantic retrieval failed: {exc}") from exc
     raise ValueError(f"Unknown retrieval mode: {mode!r}")
 
 
