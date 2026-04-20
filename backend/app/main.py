@@ -2,9 +2,13 @@
 
 from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+# Keep system env precedence (override=False by default); .env is for local dev convenience.
+load_dotenv()
 
 from app.generation.pipeline import run_generation_answer
 from app.knowledge.loader import ingest_summary
