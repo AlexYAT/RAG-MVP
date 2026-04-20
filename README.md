@@ -1,49 +1,65 @@
 # RAG MVP (Demo-first)
 
-Минимальный demo-first проект RAG-ассистента в домене медицинского оборудования.  
-Система показывает полный локальный pipeline: ingest synthetic данных, retrieval, generation, scenario handling и Web UI.
+Минимальный demo-first RAG-ассистент в домене медицинского оборудования.
 
-## Features
+Текущий baseline соответствует `DOA-IMP-014`: retrieval + grounded LLM generation соединены в рабочий end-to-end pipeline.
 
-- Scenario handling для `FAQ`, `selection`, `overview`
-- Retrieval baseline с top-k выдачей и metadata
-- Grounded generation с fallback
-- Unified orchestration flow query -> retrieval -> answer
-- Минимальный Web UI для demo-сессии
+## Current Baseline
+
+- **LLM usage в двух точках:**
+  - embeddings для semantic retrieval;
+  - grounded generation ответа из retrieval-контекста.
+- **Retrieval modes:**
+  - `semantic` (основной путь);
+  - `keyword` (сохраняется как baseline/fallback path).
+- **End-to-end flow:** `query -> retrieval -> generation -> response`.
+- **MVP behavior:** fallback и clarify сценарии для текущего набора use-cases.
+- **Evaluation baseline:** реализован и доступен отдельно (без обещания расширенной аналитики в runtime API).
 
 ## Quick Start
 
 1. Откройте терминал в каталоге `backend`.
 2. Установите зависимости:
    - `python -m pip install -r requirements.txt`
-3. Запустите backend:
+3. Создайте `.env` (например, на основе `.env.example`) и заполните `OPENAI_API_KEY`.
+4. Запустите backend:
    - `python run.py`
-4. Откройте UI:
+5. Откройте UI:
    - [http://127.0.0.1:8000/ui](http://127.0.0.1:8000/ui)
 
-## Run Backend
+## Environment Variables
 
-Из каталога `backend`:
+Минимально необходимые переменные для LLM baseline:
 
-- `python run.py`
+- `OPENAI_API_KEY` — обязателен для embeddings и generation.
+- `OPENAI_API_BASE` — базовый URL API.
+- `OPENAI_EMBEDDING_MODEL` — модель embeddings.
+- `OPENAI_GENERATION_MODEL` — модель generation.
+- `OPENAI_TIMEOUT_SEC` — таймаут API-запросов.
 
-Альтернатива:
+Переменные retrieval storage:
 
-- `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
+- `CHROMA_PATH`
+- `COLLECTION_NAME`
 
-## Open UI
+`dotenv` загружается на старте backend (`load_dotenv()`), system env сохраняет приоритет.
 
-После запуска backend откройте:
+## Runtime/API Notes
 
-- [http://127.0.0.1:8000/ui](http://127.0.0.1:8000/ui)
+Основные backend endpoints:
 
-UI отправляет запросы в scenario-level endpoint:
+- `/retrieval/search` — retrieval trace (top-k + metadata).
+- `/generation/answer` — retrieval + grounded generation.
+- `/orchestration/query` — unified query flow.
+- `/scenarios/handle` — scenario-level routing (`FAQ`, `selection`, `overview` + clarify path).
 
-- `/scenarios/handle`
+## Repository Hygiene
+
+Runtime-артефакты Chroma (`.chroma/`, `backend/.chroma/`) используются локально, но не должны попадать в git.
 
 ## Demo Flow
 
-Примеры запросов для проверки paths:
+Примеры запросов:
 
 - FAQ: `Какой срок гарантии?`
 - Overview: `Сделай обзор направлений`
@@ -54,16 +70,18 @@ UI отправляет запросы в scenario-level endpoint:
 
 - `backend/` — backend приложение и API
 - `data/knowledge/` — synthetic knowledge base
+- `data/evaluation/` — evaluation dataset и reports
 - `docs/` — DocOps lifecycle документы
-- `README.md` — entry point для внешнего пользователя
+- `README.md` — репозиторный entry point
 
-## Limitations
+## Limitations / Non-goals (Current MVP)
 
-- Demo-first baseline (не production-ready)
-- Без Docker / CI/CD / deployment
-- Без advanced security hardening
-- Ограниченный UX и минимальный state
+- Нет reranking.
+- Нет multi-provider.
+- Нет agent orchestration.
+- Нет production hardening (CI/CD, scaling, security program).
+- UI и UX остаются минимальными demo-level.
 
 ## License
 
-Проект распространяется под лицензией MIT. См. файл `LICENSE`.
+Проект распространяется под лицензией MIT. См. `LICENSE`.
