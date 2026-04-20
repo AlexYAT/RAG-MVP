@@ -7,6 +7,21 @@ import json
 from pathlib import Path
 from typing import Any
 
+QUERY_TYPES: frozenset[str] = frozenset({"lexical", "paraphrase", "noisy", "scenario"})
+QUERY_TYPE_ORDER: tuple[str, ...] = ("lexical", "paraphrase", "noisy", "scenario")
+
+
+def _parse_query_type(raw: object, *, where: str) -> str:
+    if raw is None:
+        raise ValueError(f"{where}: field 'type' is required")
+    s = str(raw).strip().lower()
+    if not s:
+        raise ValueError(f"{where}: field 'type' must be non-empty")
+    if s not in QUERY_TYPES:
+        allowed = ", ".join(sorted(QUERY_TYPES))
+        raise ValueError(f"{where}: unknown query type {raw!r}; allowed: {allowed}")
+    return s
+
 
 def _parse_sources_cell(raw: str | None) -> list[str]:
     if raw is None or str(raw).strip() == "":
@@ -33,6 +48,7 @@ def load_dataset_json(path: Path) -> list[dict[str, Any]]:
         q = str(row.get("question", "")).strip()
         if not q:
             raise ValueError(f"items[{i}].question is required")
+        qtype = _parse_query_type(row.get("type"), where=f"items[{i}]")
         exp_src = row.get("expected_sources")
         if exp_src is None:
             sources: list[str] = []
@@ -43,6 +59,7 @@ def load_dataset_json(path: Path) -> list[dict[str, Any]]:
         out.append(
             {
                 "id": str(row.get("id", f"row_{i}")),
+                "type": qtype,
                 "question": q,
                 "expected_answer": row.get("expected_answer"),
                 "expected_sources": sources,
@@ -57,14 +74,18 @@ def load_dataset_csv(path: Path) -> list[dict[str, Any]]:
         reader = csv.DictReader(f)
         if not reader.fieldnames or "question" not in reader.fieldnames:
             raise ValueError("CSV must have a 'question' column")
+        if "type" not in reader.fieldnames:
+            raise ValueError("CSV must have a 'type' column")
         for i, row in enumerate(reader):
             q = (row.get("question") or "").strip()
             if not q:
                 continue
+            qtype = _parse_query_type(row.get("type"), where=f"CSV row {i + 2}")
             ea = row.get("expected_answer")
             out.append(
                 {
                     "id": (row.get("id") or "").strip() or f"row_{i}",
+                    "type": qtype,
                     "question": q,
                     "expected_answer": ea.strip() if isinstance(ea, str) and ea.strip() else None,
                     "expected_sources": _parse_sources_cell(row.get("expected_sources")),

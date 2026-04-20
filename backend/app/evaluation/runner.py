@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
-from app.evaluation.dataset import load_dataset
+from app.evaluation.dataset import QUERY_TYPE_ORDER, load_dataset
 from app.evaluation.llm_judge import judge_answer
 from app.evaluation.retrieval_metrics import (
     expected_answer_overlap,
@@ -60,6 +60,7 @@ def _eval_one_row(
 
     return {
         "id": row["id"],
+        "type": row["type"],
         "question": q,
         "mode": mode,
         "has_gold_sources": bool(exp_src),
@@ -96,6 +97,43 @@ def _aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _comparison_block(kw_agg: dict[str, Any], sem_agg: dict[str, Any]) -> dict[str, Any]:
+    def _delta(a: float | None, b: float | None) -> float | None:
+        if a is None or b is None:
+            return None
+        return round(b - a, 4)
+
+    return {
+        "avg_correctness_delta_semantic_minus_keyword": _delta(
+            kw_agg.get("avg_correctness"), sem_agg.get("avg_correctness")
+        ),
+        "hit_rate_delta_semantic_minus_keyword": _delta(kw_agg.get("hit_rate"), sem_agg.get("hit_rate")),
+        "avg_expected_answer_overlap_delta": _delta(
+            kw_agg.get("avg_expected_answer_overlap"),
+            sem_agg.get("avg_expected_answer_overlap"),
+        ),
+        "hallucination_rate_delta_semantic_minus_keyword": _delta(
+            kw_agg.get("hallucination_rate"), sem_agg.get("hallucination_rate")
+        ),
+    }
+
+
+def _per_type_report(per_mode: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """Stable keys: lexical, paraphrase, noisy, scenario — each with keyword/semantic metrics and deltas."""
+    out: dict[str, Any] = {}
+    for qtype in QUERY_TYPE_ORDER:
+        kw_rows = [r for r in per_mode["keyword"] if r.get("type") == qtype]
+        sem_rows = [r for r in per_mode["semantic"] if r.get("type") == qtype]
+        kw_agg = _aggregate(kw_rows)
+        sem_agg = _aggregate(sem_rows)
+        out[qtype] = {
+            "keyword": kw_agg,
+            "semantic": sem_agg,
+            "comparison_keyword_vs_semantic": _comparison_block(kw_agg, sem_agg),
+        }
+    return out
+
+
 def run_evaluation(
     dataset_path: Path | None = None,
     top_k: int = 5,
@@ -114,28 +152,15 @@ def run_evaluation(
     kw_agg = _aggregate(per_mode["keyword"])
     sem_agg = _aggregate(per_mode["semantic"])
 
-    def _delta(a: float | None, b: float | None) -> float | None:
-        if a is None or b is None:
-            return None
-        return round(b - a, 4)
-
     report: dict[str, Any] = {
         "dataset_path": str(ds_path),
         "top_k": top_k,
         "summary": {
             "keyword": kw_agg,
             "semantic": sem_agg,
-            "comparison_keyword_vs_semantic": {
-                "avg_correctness_delta_semantic_minus_keyword": _delta(
-                    kw_agg.get("avg_correctness"), sem_agg.get("avg_correctness")
-                ),
-                "hit_rate_delta_semantic_minus_keyword": _delta(kw_agg.get("hit_rate"), sem_agg.get("hit_rate")),
-                "avg_expected_answer_overlap_delta": _delta(
-                    kw_agg.get("avg_expected_answer_overlap"),
-                    sem_agg.get("avg_expected_answer_overlap"),
-                ),
-            },
+            "comparison_keyword_vs_semantic": _comparison_block(kw_agg, sem_agg),
         },
+        "per_type": _per_type_report(per_mode),
         "per_item": per_mode,
     }
 

@@ -2,44 +2,52 @@
   "items": [
     {
       "id": "q1",
+      "type": "lexical",
       "question": "Какой срок гарантии на поставляемое оборудование?",
       "expected_answer": "24 месяца с даты ввода в эксплуатацию",
       "expected_sources": ["faq/faq.md"]
     },
     {
       "id": "q2",
+      "type": "lexical",
       "question": "Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
       "expected_answer": "выделенная группа с заземлением",
       "expected_sources": ["faq/faq.md"]
     },
     {
       "id": "q3",
-      "question": "Можно ли интегрировать оборудование с существующей МИС?",
+      "type": "paraphrase",
+      "question": "Можно ли связать каталог устройств с уже работающей медицинской информационной системой?",
       "expected_sources": ["faq/faq.md"]
     },
     {
       "id": "q4",
+      "type": "scenario",
       "question": "Как заказать поставку расходных материалов?",
       "expected_sources": ["faq/faq.md"]
     },
     {
       "id": "q5",
-      "question": "Какие параметры у монитора MP-100?",
+      "type": "scenario",
+      "question": "Нужно подобрать монитор для стационара: какие параметры у модели MP-100?",
       "expected_answer": "ЭКГ SpO2 НИАД",
       "expected_sources": ["equipment/device_01.md"]
     },
     {
       "id": "q6",
-      "question": "Размер экрана монитора пациента MP-100",
+      "type": "paraphrase",
+      "question": "Какой диагональ экрана у прикроватного монитора MP-100?",
       "expected_sources": ["equipment/device_01.md"]
     },
     {
       "id": "q7",
-      "question": "Что описано в directions overview?",
+      "type": "noisy",
+      "question": "directions overview что там",
       "expected_sources": ["overview/directions.md"]
     },
     {
       "id": "q8",
+      "type": "noisy",
       "question": "мониторинг взрослых стационар сценарий selection",
       "expected_sources": ["equipment/device_01.md"]
     }
