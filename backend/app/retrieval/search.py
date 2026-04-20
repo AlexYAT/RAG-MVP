@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import os
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -185,6 +186,24 @@ def get_retrieval_index() -> SemanticVectorIndex:
             )
         )
     return _semantic_index
+
+
+RetrievalMode = Literal["keyword", "semantic"]
+
+
+def search_chunks_with_mode(query: str, top_k: int, mode: RetrievalMode) -> list[RetrievalHit]:
+    """
+    Explicit retrieval mode for evaluation (no silent fallback in semantic mode).
+    """
+    m = (mode or "semantic").lower()
+    if m == "keyword":
+        return _get_keyword_index().search(query, top_k)
+    if m == "semantic":
+        try:
+            return get_retrieval_index().search(query, top_k)
+        except Exception:
+            return []
+    raise ValueError(f"Unknown retrieval mode: {mode!r}")
 
 
 def search_chunks(query: str, top_k: int) -> list[RetrievalHit]:

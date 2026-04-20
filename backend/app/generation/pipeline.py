@@ -5,7 +5,24 @@ from __future__ import annotations
 from typing import Any
 
 from app.generation.answer import generate_from_hits
-from app.retrieval.search import hits_to_payload, search_chunks
+from app.retrieval.search import RetrievalHit, hits_to_payload, search_chunks
+
+
+def run_generation_answer_with_hits(query: str, top_k: int, hits: list[RetrievalHit]) -> dict[str, Any]:
+    """Run generation using precomputed retrieval hits (evaluation / experiments)."""
+    gen = generate_from_hits(query, hits)
+    return {
+        "query": gen["query"],
+        "answer": gen["answer"],
+        "fallback": gen["fallback"],
+        "fallback_reason": gen["fallback_reason"],
+        "sources": gen["sources"],
+        "retrieval": {
+            "top_k_requested": top_k,
+            "hits_returned": len(hits),
+            "results": hits_to_payload(hits),
+        },
+    }
 
 
 def run_generation_answer(query: str, top_k: int) -> dict[str, Any]:

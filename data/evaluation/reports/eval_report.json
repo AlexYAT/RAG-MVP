@@ -1,0 +1,849 @@
+{
+  "dataset_path": "D:\\Work\\RAG MVP v2\\ProjectV2\\data\\evaluation\\eval_dataset.json",
+  "top_k": 5,
+  "summary": {
+    "keyword": {
+      "n": 8,
+      "n_labeled_sources": 8,
+      "avg_correctness": 0.4356,
+      "hit_rate": 0.875,
+      "avg_expected_answer_overlap": 0.75,
+      "hallucination_rate": 0.25
+    },
+    "semantic": {
+      "n": 8,
+      "n_labeled_sources": 8,
+      "avg_correctness": 0.3464,
+      "hit_rate": 0.875,
+      "avg_expected_answer_overlap": 0.75,
+      "hallucination_rate": 0.375
+    },
+    "comparison_keyword_vs_semantic": {
+      "avg_correctness_delta_semantic_minus_keyword": -0.0892,
+      "hit_rate_delta_semantic_minus_keyword": 0.0,
+      "avg_expected_answer_overlap_delta": 0.0
+    }
+  },
+  "per_item": {
+    "keyword": [
+      {
+        "id": "q1",
+        "question": "Какой срок гарантии на поставляемое оборудование?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 1.0,
+        "judge": {
+          "correctness": 0.455,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.9396113397045196,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "**Ответ:** Для демонстрационного каталога условный срок гарантии составляет 24 месяца с даты ввода в эксплуатацию при соблюдении регламента ТО.",
+            "score": 0.2372134491167005,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 2
+          },
+          {
+            "text": "## Вопрос: Можно ли интегрировать оборудование с существующей МИС?",
+            "score": 0.18367541206230464,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 5
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.14562871569033722,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "## Вопрос: Как заказать поставку расходных материалов?",
+            "score": 0.10443588985589104,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 7
+          }
+        ]
+      },
+      {
+        "id": "q2",
+        "question": "Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 0.25,
+        "judge": {
+          "correctness": 0.293,
+          "hallucination": "yes",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.9572568075240586,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.2646814541981302,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "# Монитор пациента MP-100 (синтетический)",
+            "score": 0.20869418122963548,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.20766293264972646,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "# Монитор пациента MP-200 Pro (синтетический)",
+            "score": 0.1953214197188088,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 0
+          }
+        ]
+      },
+      {
+        "id": "q3",
+        "question": "Можно ли интегрировать оборудование с существующей МИС?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.489,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Можно ли интегрировать оборудование с существующей МИС?",
+            "score": 0.9497533500531669,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 5
+          },
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.18171402079179927,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.11274020817563941,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "**Ответ:** В MVP предполагается наличие стандартных интерфейсов обмена (условно HL7/FHIR) у отдельных моделей; детали интеграции выходят за рамки демо.",
+            "score": 0.07131650285251445,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 6
+          },
+          {
+            "text": "Категория для демонстрации структурированного обзора: автоклавы и мойки-дезинфекторы в условной номенклатуре, без промышленных спецификаций.",
+            "score": 0.052520691185638034,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 8
+          }
+        ]
+      },
+      {
+        "id": "q4",
+        "question": "Как заказать поставку расходных материалов?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.51,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Как заказать поставку расходных материалов?",
+            "score": 0.9434408679548333,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 7
+          },
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.10401197331365246,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "**Ответ:** В MVP предполагается наличие стандартных интерфейсов обмена (условно HL7/FHIR) у отдельных моделей; детали интеграции выходят за рамки демо.",
+            "score": 0.035591946391315694,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 6
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.0319511177318203,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "**Ответ:** Для демонстрационного каталога условный срок гарантии составляет 24 месяца с даты ввода в эксплуатацию при соблюдении регламента ТО.",
+            "score": 0.031078585511435275,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 2
+          }
+        ]
+      },
+      {
+        "id": "q5",
+        "question": "Какие параметры у монитора MP-100?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 1.0,
+        "judge": {
+          "correctness": 0.524,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "# Монитор пациента MP-100 (синтетический)",
+            "score": 0.39893162041987723,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.21571116898077558,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "Направление охватывает прикроватные и центральные мониторы, параметры ЭКГ, SpO2, НИАД. Для демо используются условные классы компактных и модульных систем.",
+            "score": 0.206235567800446,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 2
+          },
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.1943267399539569,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "# Монитор пациента MP-200 Pro (синтетический)",
+            "score": 0.18421213764893676,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 0
+          }
+        ]
+      },
+      {
+        "id": "q6",
+        "question": "Размер экрана монитора пациента MP-100",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.184,
+          "hallucination": "yes",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "# Монитор пациента MP-100 (синтетический)",
+            "score": 0.6796521039895228,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.47746548236978337,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "# Монитор пациента MP-200 Pro (синтетический)",
+            "score": 0.4159782310441734,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.2717192598432035,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          },
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.14594836722945395,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q7",
+        "question": "Что описано в directions overview?",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": false,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.556,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.08671465842756247,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** реабилитация\n- **Нагрузка:** регулируемая, демо-диапазон 5–50 Вт\n- **Сценарий selection:** ограниченная площадь кабинета, индивидуальные занятия.",
+            "score": 0.08501850312388287,
+            "relative_path": "equipment/device_06.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** физиотерапия\n- **Каналы:** 2\n- **Режимы:** ТENS, NMES (условные обозначения)\n- **Сценарий selection:** реабилитация амбулаторная, базовый функционал.",
+            "score": 0.0849779198324402,
+            "relative_path": "equipment/device_05.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.08224839026710994,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стерилизация паром\n- **Объём камеры:** 30 л (демо)\n- **Цикл:** быстрый / стандартный (условные режимы)\n- **Сценарий selection:** небольшие кабинеты; требуется водоподготовка по паспорту (в демо не детализируется).",
+            "score": 0.07205339274530367,
+            "relative_path": "equipment/device_07.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q8",
+        "question": "мониторинг взрослых стационар сценарий selection",
+        "mode": "keyword",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.474,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.4181213804523289,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.38471516927744825,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.2897283167652017,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.19548598244806348,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          },
+          {
+            "text": "- **Тип:** физиотерапия\n- **Каналы:** 2\n- **Режимы:** ТENS, NMES (условные обозначения)\n- **Сценарий selection:** реабилитация амбулаторная, базовый функционал.",
+            "score": 0.14643541001451207,
+            "relative_path": "equipment/device_05.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      }
+    ],
+    "semantic": [
+      {
+        "id": "q1",
+        "question": "Какой срок гарантии на поставляемое оборудование?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 1.0,
+        "judge": {
+          "correctness": 0.489,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.8734623491764069,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "## Вопрос: Можно ли интегрировать оборудование с существующей МИС?",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 5
+          },
+          {
+            "text": "**Ответ:** Для демонстрационного каталога условный срок гарантии составляет 24 месяца с даты ввода в эксплуатацию при соблюдении регламента ТО.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 2
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.0,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q2",
+        "question": "Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 0.25,
+        "judge": {
+          "correctness": 0.44,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.9213916212320328,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.0,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.0,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.0,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.0,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q3",
+        "question": "Можно ли интегрировать оборудование с существующей МИС?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.489,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Можно ли интегрировать оборудование с существующей МИС?",
+            "score": 0.8826480433344841,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 5
+          },
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "**Ответ:** В MVP предполагается наличие стандартных интерфейсов обмена (условно HL7/FHIR) у отдельных моделей; детали интеграции выходят за рамки демо.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 6
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.0,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q4",
+        "question": "Как заказать поставку расходных материалов?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.556,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "## Вопрос: Как заказать поставку расходных материалов?",
+            "score": 0.8634207546710968,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 7
+          },
+          {
+            "text": "**Ответ:** Через закреплённого менеджера по направлению; в синтетическом сценарии достаточно ссылки на номенклатуру из каталога оборудования.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 8
+          },
+          {
+            "text": "**Ответ:** Рекомендуется выделенная группа с заземлением; точные требования зависят от модели — уточняйте по карточке устройства в каталоге.",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 4
+          },
+          {
+            "text": "## Вопрос: Какой срок гарантии на поставляемое оборудование?",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** реабилитация\n- **Нагрузка:** регулируемая, демо-диапазон 5–50 Вт\n- **Сценарий selection:** ограниченная площадь кабинета, индивидуальные занятия.",
+            "score": 0.0,
+            "relative_path": "equipment/device_06.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q5",
+        "question": "Какие параметры у монитора MP-100?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": 1.0,
+        "judge": {
+          "correctness": 0.056,
+          "hallucination": "yes",
+          "judge_backend": "heuristic"
+        },
+        "fallback": true,
+        "hits_preview": [
+          {
+            "text": "Направление охватывает прикроватные и центральные мониторы, параметры ЭКГ, SpO2, НИАД. Для демо используются условные классы компактных и модульных систем.",
+            "score": 0.0,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 2
+          },
+          {
+            "text": "# Монитор пациента MP-100 (синтетический)",
+            "score": 0.0,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.0,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.0,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.0,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q6",
+        "question": "Размер экрана монитора пациента MP-100",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.211,
+          "hallucination": "yes",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "# Монитор пациента MP-100 (синтетический)",
+            "score": 0.2301863431930542,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.21505463123321533,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "# Монитор пациента MP-200 Pro (синтетический)",
+            "score": 0.046575188636779785,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 0
+          },
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          },
+          {
+            "text": "Направление охватывает прикроватные и центральные мониторы, параметры ЭКГ, SpO2, НИАД. Для демо используются условные классы компактных и модульных систем.",
+            "score": 0.0,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 2
+          }
+        ]
+      },
+      {
+        "id": "q7",
+        "question": "Что описано в directions overview?",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": false,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.056,
+          "hallucination": "yes",
+          "judge_backend": "heuristic"
+        },
+        "fallback": true,
+        "hits_preview": [
+          {
+            "text": "- **Тип:** портативный УЗИ\n- **Датчик:** линейный + конвексный (условно)\n- **Масса:** 2.1 кг с батареей\n- **Автономность:** до 3 ч (демо-значение)\n- **Сценарий selection:** выездные осмотры, ограниченное пространство.",
+            "score": 0.0,
+            "relative_path": "equipment/device_03.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** физиотерапия\n- **Каналы:** 2\n- **Режимы:** ТENS, NMES (условные обозначения)\n- **Сценарий selection:** реабилитация амбулаторная, базовый функционал.",
+            "score": 0.0,
+            "relative_path": "equipment/device_05.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стерилизация паром\n- **Объём камеры:** 30 л (демо)\n- **Цикл:** быстрый / стандартный (условные режимы)\n- **Сценарий selection:** небольшие кабинеты; требуется водоподготовка по паспорту (в демо не детализируется).",
+            "score": 0.0,
+            "relative_path": "equipment/device_07.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** модульный монитор\n- **Экран:** 15\"\n- **Параметры:** ЭКГ, SpO2, НИАД, температура\n- **Питание:** ~130 ВА\n- **Масса:** 5.8 кг\n- **Сценарий selection:** расширенный набор параметров для отделений интенсивного наблюдения (демо).",
+            "score": 0.0,
+            "relative_path": "equipment/device_02.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.0,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          }
+        ]
+      },
+      {
+        "id": "q8",
+        "question": "мониторинг взрослых стационар сценарий selection",
+        "mode": "semantic",
+        "has_gold_sources": true,
+        "hit_at_k": true,
+        "expected_source_overlap": null,
+        "judge": {
+          "correctness": 0.474,
+          "hallucination": "no",
+          "judge_backend": "heuristic"
+        },
+        "fallback": false,
+        "hits_preview": [
+          {
+            "text": "- **Тип:** прикроватный монитор\n- **Экран:** 12\"\n- **Параметры:** ЭКГ, SpO2, НИАД\n- **Питание:** ~100 ВА, 220 В\n- **Масса:** 4.2 кг\n- **Сценарий selection:** подходит для стационара при стандартном мониторинге взрослых.",
+            "score": 0.13613200187683105,
+            "relative_path": "equipment/device_01.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** стационарная система на тележке\n- **Экран:** 19\"\n- **Сценарий selection:** стационарное отделение с высокой нагрузкой; мобильность ниже, чем у S1.",
+            "score": 0.055947184562683105,
+            "relative_path": "equipment/device_04.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "## Мониторинг пациента",
+            "score": 0.0,
+            "relative_path": "overview/directions.md",
+            "category": "overview",
+            "chunk_index": 1
+          },
+          {
+            "text": "- **Тип:** физиотерапия\n- **Каналы:** 2\n- **Режимы:** ТENS, NMES (условные обозначения)\n- **Сценарий selection:** реабилитация амбулаторная, базовый функционал.",
+            "score": 0.0,
+            "relative_path": "equipment/device_05.md",
+            "category": "equipment",
+            "chunk_index": 1
+          },
+          {
+            "text": "## Вопрос: Нужна ли отдельная линия электропитания для стационарного монитора пациента?",
+            "score": 0.0,
+            "relative_path": "faq/faq.md",
+            "category": "faq",
+            "chunk_index": 3
+          }
+        ]
+      }
+    ]
+  }
+}
