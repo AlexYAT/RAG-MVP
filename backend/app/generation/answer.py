@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
@@ -19,12 +20,17 @@ _OPENAI_API_BASE_ENV = "OPENAI_API_BASE"
 _OPENAI_TIMEOUT_SEC_ENV = "OPENAI_TIMEOUT_SEC"
 _OPENAI_GENERATION_MODEL_ENV = "OPENAI_GENERATION_MODEL"
 _DEFAULT_GENERATION_MODEL = "gpt-4o-mini"
+_SAFE_LLM_ERROR_MESSAGE = (
+    "Не удалось сформировать ответ на основе найденного контекста. "
+    "Повторите запрос позже или уточните формулировку."
+)
 _SYSTEM_PROMPT = (
     "Ты ассистент по подбору медицинского оборудования. "
     "Отвечай только на основе переданного контекста. "
     "Если данных недостаточно, прямо скажи, что в контексте нет информации. "
     "Не придумывай факты вне контекста. Ответ дай кратко и по делу."
 )
+_logger = logging.getLogger(__name__)
 
 
 def _trim(text: str, limit: int) -> str:
@@ -197,11 +203,21 @@ def generate_from_hits(query: str, hits: list[RetrievalHit]) -> dict[str, Any]:
     try:
         answer = _grounded_llm_answer(q, context)
     except OpenAIGenerationError as exc:
+        _logger.exception("LLM generation failed for query=%r: %s", q, exc)
         return {
             "query": q,
-            "answer": f"Не удалось получить LLM-ответ: {exc}",
+            "answer": _SAFE_LLM_ERROR_MESSAGE,
             "fallback": True,
             "fallback_reason": "llm_generation_error",
+            "sources": [hit_to_source(h) for h in top],
+        }
+    except Exception as exc:
+        _logger.exception("Unexpected generation error for query=%r: %s", q, exc)
+        return {
+            "query": q,
+            "answer": _SAFE_LLM_ERROR_MESSAGE,
+            "fallback": True,
+            "fallback_reason": "generation_internal_error",
             "sources": [hit_to_source(h) for h in top],
         }
 
