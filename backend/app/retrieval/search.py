@@ -1,17 +1,37 @@
-"""TF–IDF cosine baseline retrieval over chunk corpus (no LLM)."""
+"""Semantic retrieval via VectorStore (Chroma) with TF-IDF fallback."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
+from pathlib import Path
 
 import numpy as np
+from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from app.core.vectorstore.base import VectorDocument, VectorStore
+from app.core.vectorstore.chroma_store import ChromaVectorStore
 from app.knowledge.loader import load_markdown_full_documents
 from app.retrieval.chunks import build_chunk_records
 
 _MAX_TOP_K = 20
+_CHROMA_PATH_ENV = "CHROMA_PATH"
+_COLLECTION_ENV = "COLLECTION_NAME"
+
+
+def _project_root() -> Path:
+    # backend/app/retrieval/search.py -> parents[3] == repository root
+    return Path(__file__).resolve().parents[3]
+
+
+def _default_chroma_path() -> str:
+    return str(_project_root() / ".chroma")
+
+
+def _collection_name() -> str:
+    return os.getenv(_COLLECTION_ENV, "rag_mvp_chunks")
 
 
 @dataclass(frozen=True)
@@ -24,8 +44,8 @@ class RetrievalHit:
     chunk_id: int
 
 
-class TfidfChunkIndex:
-    """Sparse vector space over chunk texts."""
+class TfidfKeywordIndex:
+    """Legacy keyword fallback index."""
 
     def __init__(self) -> None:
         docs = load_markdown_full_documents()
@@ -73,18 +93,109 @@ class TfidfChunkIndex:
         return out
 
 
-_index: TfidfChunkIndex | None = None
+class SemanticVectorIndex:
+    """Primary semantic index backed by VectorStore abstraction."""
+
+    def __init__(self, store: VectorStore) -> None:
+        self._store = store
+        self._records = build_chunk_records(load_markdown_full_documents())
+        self._embedder = HashingVectorizer(
+            analyzer="char_wb",
+            ngram_range=(3, 5),
+            n_features=512,
+            alternate_sign=False,
+            norm="l2",
+        )
+        self._upsert_records()
+
+    @property
+    def chunk_count(self) -> int:
+        return len(self._records)
+
+    def _embed_text(self, text: str) -> list[float]:
+        vec = self._embedder.transform([text]).toarray()[0]
+        return [float(v) for v in vec]
+
+    @staticmethod
+    def _to_chunk_id(relative_path: str, chunk_index: int) -> str:
+        return f"{relative_path}::chunk::{chunk_index}"
+
+    def _upsert_records(self) -> None:
+        docs: list[VectorDocument] = []
+        for rec in self._records:
+            relative_path = str(rec["relative_path"])
+            category = str(rec["category"])
+            chunk_index = int(rec["chunk_index"])
+            text = str(rec["text"])
+            docs.append(
+                {
+                    "id": self._to_chunk_id(relative_path, chunk_index),
+                    "embedding": self._embed_text(text),
+                    "text": text,
+                    "metadata": {
+                        "relative_path": relative_path,
+                        "category": category,
+                        "chunk_index": chunk_index,
+                        "source": relative_path,
+                    },
+                }
+            )
+        self._store.upsert(docs)
+
+    def search(self, query: str, top_k: int) -> list[RetrievalHit]:
+        q = (query or "").strip()
+        if not q:
+            return []
+        k = max(1, min(top_k, _MAX_TOP_K))
+        res = self._store.query(self._embed_text(q), k)
+        out: list[RetrievalHit] = []
+        for i, item in enumerate(res):
+            metadata = item.get("metadata", {})
+            out.append(
+                RetrievalHit(
+                    text=str(item.get("text", "")),
+                    score=float(item.get("score", 0.0)),
+                    relative_path=str(metadata.get("relative_path", "")),
+                    category=str(metadata.get("category", "unknown")),
+                    chunk_index=int(metadata.get("chunk_index", i)),
+                    chunk_id=i,
+                )
+            )
+        return out
 
 
-def get_retrieval_index() -> TfidfChunkIndex:
-    global _index
-    if _index is None:
-        _index = TfidfChunkIndex()
-    return _index
+_semantic_index: SemanticVectorIndex | None = None
+_keyword_index: TfidfKeywordIndex | None = None
+
+
+def _get_keyword_index() -> TfidfKeywordIndex:
+    global _keyword_index
+    if _keyword_index is None:
+        _keyword_index = TfidfKeywordIndex()
+    return _keyword_index
+
+
+def get_retrieval_index() -> SemanticVectorIndex:
+    global _semantic_index
+    if _semantic_index is None:
+        _semantic_index = SemanticVectorIndex(
+            store=ChromaVectorStore(
+                persist_path=os.getenv(_CHROMA_PATH_ENV, _default_chroma_path()),
+                collection_name=_collection_name(),
+            )
+        )
+    return _semantic_index
 
 
 def search_chunks(query: str, top_k: int) -> list[RetrievalHit]:
-    return get_retrieval_index().search(query, top_k)
+    try:
+        hits = get_retrieval_index().search(query, top_k)
+        if hits:
+            return hits
+    except Exception:
+        # Keep existing MVP behavior if semantic path is not available.
+        pass
+    return _get_keyword_index().search(query, top_k)
 
 
 def hits_to_payload(hits: list[RetrievalHit]) -> list[dict[str, object]]:
